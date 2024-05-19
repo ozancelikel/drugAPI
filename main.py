@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, HTTPException
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -26,12 +26,11 @@ async def autocomplete(data: str = Form(...)):
 
 @app.post("/recursive_autocomplete", response_class=JSONResponse)
 async def search_endpoint(data: str = Form(...)):
-    print(data)
     results = es_agg.get_autocomplete_results(data)
-    print(results)
+    autocomplete_list = {}
     for res in results["aggregations"]["auto_complete"]["buckets"]:
         atc_name = es_agg.get_atc_from_brand(res["key"])
-        print(atc_name)
+        autocomplete_list[res] = atc_name
 
 
 if __name__ == '__main__':
