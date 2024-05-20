@@ -11,25 +11,55 @@
     <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <style>
+        body {
+            background-color: purple;
+        }
+
+        .btn {
+            border-radius: 20px;
+        }
+
+        #list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #list li {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        #result2 {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div style="height: 55vh;" class="jumbotron ui-widget">
-    <h4 style="text-align: center;padding: 20px;">Search as you Type with Elastic Search</h4>
-           <div style="position: relative; margin: 0 auto; width: fit-content;">
- <div id="result" style="visibility: hidden"></div>
-                            <div id="result2" ></div>
-                                    <ul id="list"></ul>
+    <div >
+        <h4 style="text-align: center;padding: 20px;">Drug-Drug Interaction Checker</h4>
+        <div style="position: relative; margin: 0 auto; width: fit-content;">
+            <div id="result" style="visibility: hidden"></div>
+            <div id="result2" ></div>
 
-       <input id="source" style="margin-bottom: 10px; width: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; outline: none;" />
 
-        <a onclick="btn_submit()" style="position: absolute; top: 0; left: calc(100% + 10px);" class="btn btn-primary">Submit</a>
-        <a onclick="btn_clear()" style="position: absolute; top: 0; left: calc(100% + 120px);" class="btn btn-primary">Clear</a>
+            <input id="source" style="margin-bottom: 10px; width: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; outline: none;" />
+
+            <a onclick="btn_submit()" style="position: absolute; top: 0; left: calc(100% + 10px);" class="btn btn-primary">Submit</a>
+            <a onclick="btn_clear()" style="position: absolute; top: 0; left: calc(100% + 120px);" class="btn btn-primary">Clear</a>
+
+
+             <ul id="list"></ul>
+        </div>
     </div>
 
-</div>
-
     <script>
-
         function generateList(data) {
             // Clear previous list items
             list.innerHTML = '';
@@ -47,17 +77,15 @@
         const $source = document.querySelector('#source');
         const $result = document.querySelector('#result');
         const $result2 = document.querySelector('#result2');
+        const list = document.querySelector('#list');
         const typeHandler = function(e) {
-
-
             $result.innerHTML = e.target.value;
             console.log(e.target.value);
             if( e.target.value.length > 0){
-
                 if (brandArray.length !== 0) {
-                     $( "#source" ).autocomplete({
-                            source: ""
-                        });
+                    $( "#source" ).autocomplete({
+                        source: ""
+                    });
                     $result2.innerHTML = brandArray[0];
                     console.log("brandarra", brandArray);
                     $.ajax({
@@ -72,54 +100,45 @@
                                 _.push(value.drug + " " + value.interaction_level[0]["interactionLevel"]); // Assuming the array contains the values you want to use
                             });
                             console.log("_", _);
-                           /* $( "#source" ).autocomplete({
-                                source: _
-                            });*/
                             generateList(_);
-
                         }
                     });
                 } else {
                     $.ajax({
-                    url: "/autocomplete",
-                    type : 'POST',
-                    cache: false,
-                    data:{'data': e.target.value},
-                    success: function(html) {
-                        console.log("html:", html);
-                        var _ = [];
-                        $.each(html, function(index, value) {
-                            _.push(value.key); // Assuming the array contains the values you want to use
-                        });
-                        console.log(_);
-                        $( "#source" ).autocomplete({
-                            source: _
-                        });
-                    }
-                });
+                        url: "/autocomplete",
+                        type : 'POST',
+                        cache: false,
+                        data:{'data': e.target.value},
+                        success: function(html) {
+                            console.log("html:", html);
+                            var _ = [];
+                            $.each(html, function(index, value) {
+                                _.push(value.key); // Assuming the array contains the values you want to use
+                            });
+                            console.log(_);
+                            $( "#source" ).autocomplete({
+                                source: _
+                            });
+                        }
+                    });
+                }
             }
-            }
-    }
+        }
         $source.addEventListener('input', typeHandler)
         $source.addEventListener('propertychange', typeHandler)
-       function btn_submit() {
+        function btn_submit() {
             // Push the value into the array
             brandArray.push($("#source").val());
             $result2.innerHTML = brandArray[0];
             $("#source").val('');
         }
-          function btn_clear() {
+        function btn_clear() {
             // Push the value into the array
             brandArray = [];
             $("#source").val('');
             $("#result2").empty();
             list.innerHTML = '';
         }
-        /*
-        $( document ).ready(function() {
-            var data = sessionStorage.getItem('brand')
-            $("#source").val(data);
-        });*/
     </script>
 </body>
 </html>

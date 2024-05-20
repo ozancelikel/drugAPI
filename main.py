@@ -17,7 +17,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 es_agg = EsAggregator(conf["ES_INDEX"], conf["ES_PORT"])
 interaction_api = InteractionAPI(conf["INTERACTION_API_IP"], conf["INTERACTION_API_PORT"])
-graph_handler = GraphHandler(conf["NEO4J_URI"], conf["NEO4J_AUTH"])
+graph_handler = GraphHandler(conf["NEO4J_URI"], (conf["NEO4J_USER"], conf["NEO4J_PSW"]))
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -44,7 +44,13 @@ async def search_endpoint(data: str = Form(...), stored: str = Form(...)):
     for key, val in autocomplete_list.items():
         interaction = graph_handler.get_relationship(val, stored_atc)
         if interaction is not None:
-            interaction_list.append({"drug": key, "atc": val, "interaction_level": interaction})
+            interaction_list.append({"drug": key, "atc": val, "interaction_level": [
+                  {
+                    "ingredient1": val,
+                    "ingredient2": stored_atc,
+                    "interactionLevel": interaction["level"]
+                  }
+                ]})
         else:
             interaction = interaction_api.get_interactions(val, stored_atc)
             interaction_list.append({"drug": key, "atc": val, "interaction_level": interaction})

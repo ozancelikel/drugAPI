@@ -3,15 +3,19 @@ from py2neo import Graph, Node, Relationship
 
 
 class GraphHandler:
-    def __init__(self, uri, auth):
+    def __init__(self, uri: str, auth: tuple):
         self.__graph = Graph(f"{uri}", auth=auth)
 
-    def add_new_relation(self, node_1_lbl: str, node_2_lbl: str, level: str):
-        node_1 = Node("Atc", name=node_1_lbl)
-        node_2 = Node("Atc", name=node_2_lbl)
+    def add_new_relation(self, node_1_lbl: str, node_2_lbl: str, level: dict):
+        node_1 = self.get_node(node_1_lbl)
+        node_2 = self.get_node(node_2_lbl)
+        if node_1 is None:
+            node_1 = Node("Atc", name=node_1_lbl)
+        if node_2 is None:
+            node_2 = Node("Atc", name=node_2_lbl)
         try:
-            self.__graph.create(Relationship(node_1, "INTERACTS", node_2, level=level))
-            self.__graph.create(Relationship(node_2, "INTERACTS", node_1, level=level))
+            self.__graph.create(Relationship(node_1, "INTERACTS", node_2, level=level[0]["interactionLevel"]))
+            self.__graph.create(Relationship(node_2, "INTERACTS", node_1, level=level[0]["interactionLevel"]))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
