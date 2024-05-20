@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form, HTTPException
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -42,7 +42,7 @@ async def search_endpoint(data: str = Form(...), stored: str = Form(...)):
     interaction_list = []
     stored_atc = es_agg.get_atc_from_brand(stored)
     for key, val in autocomplete_list.items():
-        interaction = graph_handler.get_relationship(val, stored_atc)
+        interaction = graph_handler.read_relation(val, stored_atc)
         if interaction is not None:
             interaction_list.append({"drug": key, "atc": val, "interaction_level": [
                   {
@@ -55,7 +55,7 @@ async def search_endpoint(data: str = Form(...), stored: str = Form(...)):
             interaction = interaction_api.get_interactions(val, stored_atc)
             interaction_list.append({"drug": key, "atc": val, "interaction_level": interaction})
             # TODO: Check if interaction level is parsed correctly
-            graph_handler.add_new_relation(val, stored_atc, interaction)
+            graph_handler.write_relation(val, stored_atc, interaction)
     return interaction_list
 
 

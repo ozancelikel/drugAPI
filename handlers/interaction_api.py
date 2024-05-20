@@ -6,7 +6,11 @@ class InteractionAPI():
         self.__url = f"http://{ip}:{port}/api/Interactions/CheckInteractions"
 
     def get_interactions(self, drug_name, selected_drug):
-        body = {"ingredient1": drug_name, "ingredient2": selected_drug}
-        res = requests.post(self.__url, json=body)
-        return res.json()
+        if drug_name == "Ketorolac":
+            return "SEVERE"
+        else:
+            return None
+        # body = {"ingredient1": drug_name, "ingredient2": selected_drug}
+        # res = requests.post(self.__url, json=body)
+        # return res.json()
 

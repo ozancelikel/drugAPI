@@ -1,5 +1,5 @@
-ES_PORT: 9200
-ES_INDEX: "drugs_suggest2"
+ES_PORT: 9201
+ES_INDEX: "drugs"
 
 NEO4J_URI: "neo4j+s://e7958ee4.databases.neo4j.io:7687"
 NEO4J_USER: "neo4j"
