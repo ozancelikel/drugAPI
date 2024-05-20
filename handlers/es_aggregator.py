@@ -43,7 +43,7 @@ class EsAggregator:
                         "order": {
                             "_count": "desc"
                         },
-                        "size": 25
+                        "size": 5
                     }
                 }
             }
