@@ -3,6 +3,10 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import uvicorn
+import yaml
+
+with open('config.yaml', 'r') as file:
+    conf = yaml.safe_load(file)
 
 from handlers.es_aggregator import EsAggregator
 from handlers.interaction_api import InteractionAPI
@@ -11,11 +15,10 @@ from handlers.graph_handler import GraphHandler
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
-es_agg = EsAggregator("drugs", 9201)
-interaction_api = InteractionAPI("localhost", 5163)
-URI = "neo4j+s://e7958ee4.databases.neo4j.io:7687"
-AUTH = ("neo4j", "PefqeKG_6KZPCGLC-VYFuEH4RTr_HzgDX6aNWPnKQa8")
-graph_handler = GraphHandler(URI, AUTH)
+es_agg = EsAggregator(conf["ES_INDEX"], conf["ES_PORT"])
+interaction_api = InteractionAPI(conf["INTERACTION_API_IP"], conf["INTERACTION_API_PORT"])
+graph_handler = GraphHandler(conf["NEO4J_URI"], conf["NEO4J_AUTH"])
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -51,4 +54,4 @@ async def search_endpoint(data: str = Form(...), stored: str = Form(...)):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host="127.0.0.1", port=8002)
+    uvicorn.run(app, host=conf["MAIN_IP"], port=conf["MAIN_PORT"])
