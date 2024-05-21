@@ -14,11 +14,13 @@
 
     <style>
         body {
-            background-color: purple;
+            background-color: #83BCCB;
         }
 
         .btn {
             border-radius: 20px;
+            background: #D34FF9;
+
         }
 
         #list {
@@ -36,25 +38,39 @@
         #result2 {
             background-color: #f8f9fa;
             padding: 10px;
+            height: 30px;
+            display: flex; /* Use flex display */
+            align-items: center; /* Align items vertically in the center */
+            justify-content: center; /* Align items horizontally in the center */
             border-radius: 5px;
             margin-top: 10px;
         }
+
+        .align-right {
+            text-align: right;
+        }
+
+        .half-width {
+            width: 50%;
+        }
+
+
     </style>
 </head>
 <body>
     <div >
         <h4 style="text-align: center;padding: 20px;">Drug-Drug Interaction Checker</h4>
         <div style="position: relative; margin: 0 auto; width: fit-content;">
-            <div id="result" style="visibility: hidden"></div>
-            <div id="result2" ></div>
 
 
-            <input id="source" style="margin-bottom: 10px; width: 300px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; outline: none;" />
+                    <input id="source" style="margin-bottom: 10px; width: 500px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; outline: none;" />
 
-            <a onclick="btn_submit()" style="position: absolute; top: 0; left: calc(100% + 10px);" class="btn btn-primary">Submit</a>
-            <a onclick="btn_clear()" style="position: absolute; top: 0; left: calc(100% + 120px);" class="btn btn-primary">Clear</a>
+                    <a onclick="btn_submit()" style="position: absolute; top: 0; left: calc(100% + 10px);" class="btn">Submit</a>
+                <a onclick="btn_clear()" style="position: absolute; top: 0; left: calc(100% + 120px);" class="btn">Clear</a>
+                    <div id="result" style="visibility: hidden"></div>
+                     <div id="result2" ></div>
 
-
+              <br/>
              <ul id="list"></ul>
         </div>
     </div>
@@ -72,6 +88,44 @@
             });
         }
 
+        function generateList2(data) {
+            list.innerHTML = '';
+            console.log("mydata", data);
+
+            // Loop through the data and create list items
+            for (let i = 0; i < data.length; i++) {
+                const item = data[i];
+
+                // Create list item
+                const listItem = document.createElement('li');
+                listItem.style.display = 'flex';
+                // Create two spans for each column
+                const column1 = document.createElement('span');
+                column1.style.width = '50%';
+
+                const column2 = document.createElement('span');
+                column2.style.width = '50%';
+                column2.style.textAlign = 'right';
+                // Set content for columns
+                column1.textContent = item[0]; // First column content
+                column2.textContent = item[1]; // Second column content
+
+                //*/ Apply CSS class to align second column to the right
+
+               // column2.classList.add('align-right');
+                //column1.classList.add('half-width');
+               // column2.classList.add('half-width');
+
+                // Append columns to list item
+                listItem.appendChild(column1);
+                listItem.appendChild(column2);
+
+                // Append list item to list
+                list.appendChild(listItem);
+            }
+        }
+
+
         var brandArray = [];
 
         const $source = document.querySelector('#source');
@@ -81,7 +135,7 @@
         const typeHandler = function(e) {
             $result.innerHTML = e.target.value;
             console.log(e.target.value);
-            if( e.target.value.length > 0){
+            if( e.target.value.length > 2){
                 if (brandArray.length !== 0) {
                     $( "#source" ).autocomplete({
                         source: ""
@@ -97,10 +151,10 @@
                             console.log("html:", html);
                             var _ = [];
                             $.each(html, function(index, value) {
-                                _.push(value.drug + " " + value.interaction_level[0]["interactionLevel"]); // Assuming the array contains the values you want to use
+                                _.push([value.drug , value.interaction_level[0]["interactionLevel"]]); // Assuming the array contains the values you want to use
                             });
                             console.log("_", _);
-                            generateList(_);
+                            generateList2(_);
                         }
                     });
                 } else {
